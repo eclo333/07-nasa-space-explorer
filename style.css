@@ -1,14 +1,21 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Public+Sans:wght@400;600;700&display=swap');
+
 /* ── CSS Variables — OKLCH Palette (2026 standards) ─────────────────────────
    OKLCH is perceptually uniform: the "lightness" value always looks the same
    to the human eye, making color adjustments predictable and accessible.
    Format: oklch(Lightness% Chroma HueDegrees)
    ────────────────────────────────────────────────────────────────────────── */
 :root {
-  /* NASA Official Colors */
-  --nasa-blue:   oklch(32% 0.16 254);
-  --nasa-red:    oklch(63% 0.25 29);
-  --space-black: oklch(15% 0.02 250);
+  /* NASA Official Palette in Perceptual OKLCH */
+  --nasa-blue:   oklch(32.14% 0.16 254.14);
+  --nasa-red:    oklch(59.69% 0.23 28.5);
+  --space-black: oklch(12% 0.01 250);
   --star-white:  oklch(98% 0.01 250);
+
+  /* Functional Glassmorphism Tokens */
+  --glass-surface: oklch(100% 0 0 / 5%);
+  --glass-border:  oklch(100% 0 0 / 12%);
+  --glow-accent:   color-mix(in oklch, var(--nasa-red) 40%, transparent);
 
   /* Semantic tokens — use these throughout, not raw colors */
   --bg-primary:  var(--space-black);
@@ -17,8 +24,8 @@
   --interactive: var(--nasa-blue);
 
   /* Glassmorphism surfaces */
-  --glass-bg:     oklch(100% 0 0 / 5%);
-  --glass-border: oklch(100% 0 0 / 10%);
+  --glass-bg:     var(--glass-surface);
+  --glass-line:   var(--glass-border);
 
   /* Border radii */
   --radius-sm: 6px;
@@ -49,13 +56,26 @@
 
 /* ── Base ───────────────────────────────────────────────────────────────────── */
 body {
-  font-family: Arial, sans-serif;
+  font-family: 'Public Sans', Arial, sans-serif;
   background-color: var(--bg-primary);
+  background-image:
+    radial-gradient(circle at 20% 20%, oklch(30% 0.05 252 / 14%) 0%, transparent 40%),
+    radial-gradient(circle at 80% 10%, oklch(42% 0.06 260 / 10%) 0%, transparent 35%),
+    radial-gradient(circle at 50% 80%, oklch(26% 0.04 248 / 14%) 0%, transparent 45%);
+  background-attachment: fixed;
+  background-size: 180% 180%;
+  animation: starfieldDrift 36s linear infinite;
   color: var(--text-main);
   /* accent-color styles native controls (checkboxes, date pickers, etc.) */
   accent-color: var(--accent);
   min-height: 100dvh;
-  padding: 20px;
+  padding: clamp(1rem, 5vw, 4rem);
+  position: relative;
+}
+
+@keyframes starfieldDrift {
+  from { background-position: 0% 0%; }
+  to { background-position: 100% 100%; }
 }
 
 /* ── Centered layout container ──────────────────────────────────────────────── */
@@ -78,7 +98,7 @@ body {
 
   /* Nested rule — targets h1 that lives inside .site-header */
   & h1 {
-    font-family: Verdana, sans-serif;
+    font-family: 'Public Sans', Arial, sans-serif;
     font-weight: bold;
     color: var(--text-main);
     font-size: 2rem;
@@ -107,7 +127,7 @@ body {
    ─────────────────────────────────────────────────────────────────────────── */
 .space-fact {
   background: var(--glass-bg);
-  border: 1px solid var(--glass-border);
+  border: 1px solid var(--glass-line);
   border-left: 4px solid var(--accent); /* NASA-red left accent */
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px); /* Safari support */
@@ -132,12 +152,12 @@ body {
 .filters {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
   align-items: stretch;
   margin-bottom: 28px;
   padding: 16px;
   background: var(--glass-bg);
-  border: 1px solid var(--glass-border);
+  border: 1px solid var(--glass-line);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border-radius: var(--radius-md);
@@ -160,13 +180,29 @@ body {
   }
 }
 
+/* Bento style range selector: shared panel for both date inputs */
+.date-bento {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+  padding: 10px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--glass-line);
+  background: oklch(100% 0 0 / 3%);
+
+  @media (min-width: 600px) {
+    grid-template-columns: 1fr 1fr;
+    flex: 1;
+  }
+}
+
 /* ── Date Inputs ────────────────────────────────────────────────────────────── */
 input[type="date"] {
-  font-family: Arial, sans-serif;
+  font-family: 'DM Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
   color: var(--text-main);
   background-color: oklch(20% 0.03 250);
   padding: 10px 15px;
-  border: 1px solid oklch(40% 0.1 254);
+  border: 1px solid oklch(40% 0.1 254 / 70%);
   border-radius: var(--radius-sm);
   font-size: 16px;
   line-height: 1.4;
@@ -185,14 +221,13 @@ input[type="date"] {
   }
 
   @media (min-width: 600px) {
-    width: auto;
-    flex: 1;
+    width: 100%;
   }
 }
 
 /* ── Fetch Button ───────────────────────────────────────────────────────────── */
 #fetchBtn {
-  font-family: Arial, sans-serif;
+  font-family: 'Public Sans', Arial, sans-serif;
   font-weight: bold;
   color: var(--text-main);
   background-color: var(--accent);
@@ -205,11 +240,13 @@ input[type="date"] {
   cursor: pointer;
   letter-spacing: 1px;
   text-transform: uppercase;
-  transition: background-color 0.2s, scale 0.1s;
+  transition: background-color 0.2s, transform 0.2s, box-shadow 0.2s, scale 0.1s;
   white-space: nowrap;
 
   &:hover {
     background-color: oklch(55% 0.25 29);
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 10px 24px var(--glow-accent);
   }
 
   &:active {
@@ -219,6 +256,14 @@ input[type="date"] {
   @media (min-width: 600px) {
     width: auto;
   }
+}
+
+/* Branded focus rings for keyboard users */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible {
+  outline: 2px solid var(--nasa-red);
+  outline-offset: 4px;
 }
 
 /* ── Gallery — CSS Grid + Container Queries ─────────────────────────────────
@@ -238,6 +283,7 @@ input[type="date"] {
 
   /* Named view-transition so the browser animates THIS element on update */
   view-transition-name: gallery;
+  cursor: crosshair;
 }
 
 /* Container Query: taller images when the gallery is wide enough for 2+ columns */
@@ -251,7 +297,7 @@ input[type="date"] {
 /* ── Gallery Item — CSS Nesting for all child states ───────────────────────── */
 .gallery-item {
   background: var(--glass-bg);
-  border: 1px solid var(--glass-border);
+  border: 1px solid var(--glass-line);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   padding: 10px;
@@ -299,7 +345,7 @@ input[type="date"] {
    ─────────────────────────────────────────────────────────────────────────── */
 .skeleton-card {
   background: var(--glass-bg);
-  border: 1px solid var(--glass-border);
+  border: 1px solid var(--glass-line);
   border-radius: var(--radius-md);
   overflow: hidden;
   padding: 10px;
@@ -375,7 +421,23 @@ input[type="date"] {
   & .placeholder-icon {
     font-size: 64px;
     margin-bottom: 20px;
+    transition: transform 0.25s ease;
+    cursor: crosshair;
   }
+}
+
+/* Micro-animation for the telescope icon when the scan button is hovered */
+.container:has(#fetchBtn:hover) .telescope-icon {
+  animation: scopePulse 0.9s ease-in-out infinite alternate;
+}
+
+.telescope-icon:hover {
+  transform: rotate(-8deg) scale(1.08);
+}
+
+@keyframes scopePulse {
+  from { transform: translateY(0) rotate(0deg) scale(1); }
+  to { transform: translateY(-2px) rotate(-6deg) scale(1.06); }
 }
 
 /* ── Error Message ───────────────────────────────────────────────────────────── */
@@ -408,7 +470,7 @@ input[type="date"] {
   background: oklch(18% 0.04 250 / 95%);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border: 1px solid var(--glass-border);
+  border: 1px solid var(--glass-line);
   border-radius: var(--radius-lg);
   max-width: 800px;
   width: 100%;
